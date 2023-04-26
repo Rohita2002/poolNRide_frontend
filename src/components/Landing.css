@@ -1,0 +1,71 @@
+.mainLanding {
+	max-width: 100%;
+}
+.aboutLandingMain {
+	margin-left: 10%;
+	margin-right: 10%;
+	align-items: center;
+	display: grid;
+	grid-template-columns: 3fr 2fr;
+	padding: 15px 30px;
+	/* border: 1px solid black; */
+}
+
+.aboutLanding1 {
+	/* margin-left: 25%;
+    margin-right: 25%; */
+	padding: 15px 30px;
+	text-align: justify;
+}
+.aboutLanding1 h1 {
+	color: rgb(107, 107, 233);
+}
+.aboutLanding1 p {
+	color: rgb(96, 96, 96);
+}
+.aboutLanding2 {
+	/* margin-left: 25%;
+    margin-right: 25%; */
+	padding: 15px 30px;
+	text-align: justify;
+	width: 100%;
+	height: 100%;
+}
+.aboutLanding3 {
+	/* margin-left: 25%;
+    margin-right: 25%; */
+	padding: 15px 30px;
+	text-align: justify;
+}
+.aboutLanding3 button {
+	font-size: 20px;
+	padding: 15px;
+	background-color: rgb(139, 129, 228);
+	cursor: pointer;
+	border: none;
+	border-radius: 10px;
+}
+.aboutLanding3 button:hover {
+	background-color: rgb(139, 129, 228, 0.5);
+}
+
+.footerLanding {
+	margin-left: 10%;
+	margin-right: 10%;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	padding: 15px 30px;
+}
+.footerSection {
+	margin-top: 5%;
+	padding: 15px 30px;
+	color: rgb(107, 107, 233);
+	text-align: left;
+	font-size: large;
+}
+.footerOption {
+	cursor: pointer;
+	font-size: medium;
+	color: rgb(65, 65, 65);
+	padding-top: 3%;
+}
