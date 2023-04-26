@@ -57,7 +57,7 @@ class App extends Component {
 					<Routes>
 						<Route path="/" element={<Landing />} />
 						<Route path="/admin" element={<Admin />} />
-						<Route path="/about" element={<About />} />
+						<Route path="https://poolnride-dlzl.onrender.com/about" element={<About />} />
 						<Route path="/signup" element={<Signup />} />
 						<Route path="/signin" element={<Signin />} />
 						<Route path="/homeuser" element={<HomeUser />} />
