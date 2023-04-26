@@ -20,7 +20,7 @@ export default class ViewPools extends Component {
 	}
 
 	getEveryRide() {
-		const uri = `http://localhost:4000/ride/rides`;
+		const uri = `https://poolnride-api.onrender.com/ride/rides`;
 
 		// Get user id and send it in with the post request.
 
@@ -51,7 +51,7 @@ export default class ViewPools extends Component {
 	handleDelete(id) {
 		console.log('ride to be deleted:', id);
 
-		const uri = `http://localhost:4000/ride/${id}`;
+		const uri = `https://poolnride-api.onrender.com/ride/${id}`;
 
 		const self = this;
 
