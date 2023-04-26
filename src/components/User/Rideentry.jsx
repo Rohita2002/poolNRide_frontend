@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Mapbox from './MapBox';
+// import Mapbox from './MapBox';
 const Swal = require('sweetalert2');
 
 /**
