@@ -19,7 +19,6 @@ import Payment from './components/User/Payment';
 import Feedback from './components/User/Feedback';
 import ViewUsers from './components/Admin/ViewUsers';
 import ViewPools from './components/Admin/ViewPools';
-// import Mapbox from './components/User/MapBox';
 
 class App extends Component {
 	constructor(props) {
@@ -67,7 +66,6 @@ class App extends Component {
 						<Route path="/feedback" element={<Feedback />} />
 						<Route path="/viewusers" element={<ViewUsers />} />
 						<Route path="/viewpools" element={<ViewPools />} />
-						{/* <Route path="/mapbox" element={<Mapbox />} /> */}
 					</Routes>
 				</Router>
 			</div>

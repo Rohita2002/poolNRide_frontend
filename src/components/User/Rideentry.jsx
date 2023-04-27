@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import Mapbox from './MapBox';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
+import Map from './Map';
 const Swal = require('sweetalert2');
 
 /**
@@ -17,12 +19,15 @@ class Rideentry extends Component {
 			shouldShowComplete: this.props.shouldShowComplete,
 			shouldShowFeedback: this.props.shouldShowFeedback,
 			poolDetails: this.props,
-			poolID: '',
+			poolID: this.props.rideID,
 			memberID: JSON.parse(localStorage.getItem('userID')), //user rider
 			hasGivenFeedback: false,
-			// canJoin: false,
 			rides: [],
 			showMap: false,
+			choseJoin: false,
+			waypoint: '',
+			// setShowModal: false,
+			showModal: false,
 		};
 
 		this.showDate = this.showDate.bind(this);
@@ -30,16 +35,53 @@ class Rideentry extends Component {
 		this.showPrice = this.showPrice.bind(this);
 
 		this.handleclick = this.handleclick.bind(this);
+		this.handleJoin = this.handleJoin.bind(this);
 		this.handleclickDelete = this.handleclickDelete.bind(this);
 		this.handleclickComplete = this.handleclickComplete.bind(this);
 		this.handleclickFeedback = this.handleclickFeedback.bind(this);
 		this.getRidesAsRider = this.getRidesAsRider.bind(this);
+		this.handleShowModal = this.handleShowModal.bind(this);
+		this.handleHideModal = this.handleHideModal.bind(this);
+		this.handleclickVersion = this.handleclickVersion.bind(this);
 
 		// this.checkToken = this.checkToken.bind(this);
 
 		this.checkToken();
 		this.getUser(this.props.driverID);
 		this.getRidesAsRider();
+	}
+
+	handleHideModal() {
+		this.setState({
+			showModal: false,
+		});
+		// setShowModal(false);
+	}
+
+	handleShowModal() {
+		console.log('inside handle show modal');
+		this.setState({
+			showModal: true,
+		});
+		// setShowModal(true);
+
+		console.log(this.state.setShowModal);
+	}
+
+	handleJoin(event) {
+		console.log('inside handle Join');
+
+		const target = event.target;
+		const value = target.value;
+		const name = target.name;
+
+		console.log('name and value', name, value);
+
+		this.setState({
+			[name]: value,
+		});
+
+		console.log(this.state.waypoint);
 	}
 
 	checkToken() {
@@ -103,9 +145,90 @@ class Rideentry extends Component {
 			// this.setState({ showMap: true });
 			console.log('ride to be joined:', this.state);
 
-			const uri = `http://localhost:4000/ride/joinPool`;
+			this.setState({
+				choseJoin: true,
+			});
 
-			// const self = this;
+			console.log('this state in join', this.state);
+
+			// const uri = `http://localhost:4000/ride/joinPool`;
+
+			// // const self = this;
+
+			// const body = JSON.stringify(this.state);
+
+			// fetch(uri, {
+			// 	method: 'POST',
+			// 	body,
+			// 	headers: {
+			// 		'Content-Type': 'application/json',
+			// 	},
+			// })
+			// 	.then((response) => {
+			// 		if (response.status === 200) {
+			// 			console.log('joined');
+			// 			Swal.fire({
+			// 				position: 'top-end',
+			// 				icon: 'success',
+			// 				title: 'Ride saved in your account',
+			// 				showConfirmButton: false,
+			// 				timer: 1500,
+			// 			});
+			// 			// window.location.reload();
+			// 		}
+			// 	})
+			// 	.catch((err) => {
+			// 		console.log('Request failed', err);
+			// 	});
+		}
+	}
+
+	async handleclickVersion() {
+		console.log('clicked join.....');
+		console.log('rides in join click', this.state.rides);
+
+		let canJoin = false;
+
+		const hasRideWithin10Minutes = this.state.rides.some((r) => {
+			if (r.date.slice(0, 10) === this.state.poolDetails.date.slice(0, 10)) {
+				console.log('matched with', r);
+				console.log('date of matches', r.date);
+				const rideTime = new Date(r.date).getTime();
+				console.log('ride time', rideTime);
+				const now = new Date(this.state.poolDetails.date).getTime();
+				console.log('now time', now);
+				const timeDiff = Math.abs(rideTime - now);
+				console.log('time diff', timeDiff);
+				const diffInMinutes = Math.round(timeDiff / (1000 * 60)); // Convert milliseconds to minutes
+				console.log('diff in mins', diffInMinutes);
+				console.log('return ', diffInMinutes >= 0 && diffInMinutes <= 10);
+				return diffInMinutes >= 0 && diffInMinutes <= 10;
+			} else {
+				return false;
+			}
+		});
+
+		// If the user has a ride within 10 minutes, display an alert and prevent them from joining
+		if (!hasRideWithin10Minutes) {
+			canJoin = true;
+		}
+
+		console.log('has ride within 10 min?', hasRideWithin10Minutes, canJoin);
+
+		if (!canJoin) {
+			// alert(
+			// 	'You have a ride within the next 10 minutes. You cannot join this ride.'
+			// );
+			Swal.fire(
+				'',
+				'You have a ride within the next 10 minutes. You cannot join this ride',
+				'question'
+			);
+		} else {
+			console.log('entered else');
+			console.log('ride to be joined:', this.state);
+
+			const uri = `http://localhost:4000/ride/joinPool`;
 
 			const body = JSON.stringify(this.state);
 
@@ -124,8 +247,8 @@ class Rideentry extends Component {
 							icon: 'success',
 							title: 'Ride saved in your account',
 							showConfirmButton: false,
-							timer: 1500
-						  })
+							timer: 1500,
+						});
 						// window.location.reload();
 					}
 				})
@@ -409,13 +532,45 @@ class Rideentry extends Component {
 									</button>
 								</td>
 							)}
-							{/* Render the Mapbox component here if showMap is true */}
-							{/* {this.state.showMap && (
-								<Mapbox
-									pickupAddress={this.state.poolDetails.departure}
-									dropoffAddress={this.state.poolDetails.destination}
-								/>
-							)} */}
+							{this.state.shouldShowJoin && this.state.choseJoin && (
+								<td>
+									<input
+										className="RideEntryField"
+										type="text"
+										name="waypoint"
+										value={this.state.waypoint}
+										onChange={this.handleJoin}
+									/>
+									<Button variant="primary" onClick={this.handleShowModal}>
+										Show Map
+									</Button>
+									<Modal
+										show={this.state.showModal}
+										onHide={this.handleHideModal}
+									>
+										<Modal.Header closeButton>
+											<Modal.Title>Map Modal</Modal.Title>
+										</Modal.Header>
+										<Modal.Body style={{ height: '400px' }}>
+											<Map
+												searchQueries={[
+													this.state.poolDetails.departure,
+													this.state.waypoint,
+													this.state.poolDetails.destination,
+												]}
+											/>
+										</Modal.Body>
+										<Modal.Footer>
+											<Button
+												variant="secondary"
+												onClick={this.handleclickVersion}
+											>
+												Confirm
+											</Button>
+										</Modal.Footer>
+									</Modal>
+								</td>
+							)}
 							{this.state.shouldShowDelete && (
 								<td>
 									<button

@@ -26,15 +26,16 @@ export default class ViewUsers extends Component {
 		this.getAllVehicles();
 	}
 
-	showImage(){
+	showImage() {
+		const userID = JSON.parse(localStorage.getItem('userID'));
 		Swal.fire({
 			title: 'License ID!',
 			text: 'Modal with a custom image.',
-			imageUrl: 'https://unsplash.it/400/200',
+			imageUrl: `http://localhost:4000/${userID}.png`,
 			imageWidth: 400,
 			imageHeight: 200,
 			imageAlt: 'Custom image',
-		  })
+		});
 	}
 
 	getAllUsers() {

@@ -21,7 +21,7 @@ const Navigation = () => {
 				<Navbar.Brand href="/">PoolNRide</Navbar.Brand>
 				<Nav className="me-auto">
 					<Nav.Link href="/about">About Me</Nav.Link>
-					<Nav.Link href="/Signup">Signup</Nav.Link>
+					<Nav.Link href="/signup">Signup</Nav.Link>
 					<Nav.Link href="/signin">Signin</Nav.Link>
 				</Nav>
 			</Container>
