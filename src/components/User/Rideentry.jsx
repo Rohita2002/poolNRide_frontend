@@ -249,7 +249,7 @@ class Rideentry extends Component {
 							showConfirmButton: false,
 							timer: 1500,
 						});
-						// window.location.reload();
+						window.location.reload();
 					}
 				})
 				.catch((err) => {
@@ -547,6 +547,7 @@ class Rideentry extends Component {
 									<Modal
 										show={this.state.showModal}
 										onHide={this.handleHideModal}
+										size="lg"
 									>
 										<Modal.Header closeButton>
 											<Modal.Title>Map Modal</Modal.Title>

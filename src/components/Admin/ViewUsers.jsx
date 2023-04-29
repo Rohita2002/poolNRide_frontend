@@ -12,6 +12,7 @@ export default class ViewUsers extends Component {
 		this.state = {
 			Users: [],
 			vehicles: [],
+			url: '',
 		};
 
 		this.getAllUsers = this.getAllUsers.bind(this);
@@ -20,22 +21,90 @@ export default class ViewUsers extends Component {
 		this.calculateAverageRating = this.calculateAverageRating.bind(this);
 		this.displayStars = this.displayStars.bind(this);
 		this.getAllVehicles = this.getAllVehicles.bind(this);
-		this.showImage = this.showImage.bind(this);
+		this.handleVerify = this.handleVerify.bind(this);
 
 		this.getAllUsers();
 		this.getAllVehicles();
 	}
 
-	showImage() {
-		const userID = JSON.parse(localStorage.getItem('userID'));
-		Swal.fire({
-			title: 'License ID!',
-			text: 'Modal with a custom image.',
-			imageUrl: `http://localhost:4000/${userID}.png`,
-			imageWidth: 400,
-			imageHeight: 200,
-			imageAlt: 'Custom image',
-		});
+	handleVerify(id, showvb) {
+		console.log('clicked verify');
+
+		if (!showvb) {
+			Swal.fire('User is already verified');
+		} else {
+			const uri = `http://localhost:4000/user/${id}`;
+
+			// Get user id and send it in with the post request.
+
+			const self = this;
+
+			fetch(uri, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ verified: true }),
+			})
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error('Failed to update user');
+					}
+					// handle success
+					Swal.fire({
+						position: 'top-end',
+						icon: 'success',
+						title: 'User is verified',
+						showConfirmButton: false,
+						timer: 1500,
+					});
+					window.location.reload();
+				})
+				.catch((error) => {
+					// handle error
+					console.log(error);
+				});
+		}
+	}
+
+	showImage(id, showverbut) {
+		fetch(`http://localhost:4000/user/image/${id}.png`)
+			.then((response) => {
+				if (response.status === 200) {
+					return response.blob();
+				} else {
+					throw new Error('Image not found');
+				}
+			})
+			.then((blob) => {
+				this.url = URL.createObjectURL(blob);
+				console.log('url', this.state.url);
+				Swal.fire({
+					title: 'License ID',
+					imageUrl: `${this.url}`,
+					imageWidth: 400,
+					imageHeight: 200,
+					imageAlt: 'Custom image',
+					footer: '<button id="verify-btn">Verify</button>',
+					// Add an event listener to the "Verify" button
+					didOpen: () => {
+						const verifyBtn = document.getElementById('verify-btn');
+						verifyBtn.addEventListener('click', () => {
+							this.handleVerify(id, showverbut);
+						});
+					},
+					// Remove the event listener when the SweetAlert dialog box is closed
+					willClose: () => {
+						const verifyBtn = document.getElementById('verify-btn');
+						verifyBtn.removeEventListener('click', () => {
+							this.handleVerify(id, showverbut);
+						});
+					},
+				});
+			})
+			.catch((error) => {
+				this.setState({ error: error.message });
+			});
 	}
 
 	getAllUsers() {
@@ -188,57 +257,80 @@ export default class ViewUsers extends Component {
 								</tr>
 							</thead>
 							<tbody>
-								{this.state.Users?.map((user, index) => (
-									<tr key={user._id}>
-										<td>{index + 1}</td>
-										<td>{user.firstname}</td>
-										<td>{user.username}</td>
-										<td>{user.emailID}</td>
-										<td>{user.mobileNumber}</td>
-										<td>
-											{/* <h4>Recent Feedbacks</h4> */}
-											{user.feedback.slice(0, 3).map((feedback, idx) => (
-												<div key={idx}>
-													<p>
-														{idx + 1}. Message: {feedback.message}
-													</p>
-													<p>Rating: {this.displayStars(feedback.rating, 5)}</p>
-												</div>
-											))}
-										</td>
-										<td>
-											{/* <h4>Average Rating</h4> */}
-											{user.feedback.length > 0 ? (
-												<div>
-													<p>
-														{this.displayStars(
-															this.calculateAverageRating(user.feedback),
-															5
-														)}
-													</p>
-												</div>
+								{this.state.Users?.map((user, index) => {
+									const sortedFeedback = user.feedback
+										.sort((a, b) => {
+											const aTimestamp = new Date(
+												parseInt(a._id.toString().substring(0, 8), 16) * 1000
+											);
+											const bTimestamp = new Date(
+												parseInt(b._id.toString().substring(0, 8), 16) * 1000
+											);
+											return bTimestamp - aTimestamp;
+										})
+										.slice(0, 3);
+
+									const showVerifyButton = user?.verified;
+
+									return (
+										<tr key={user._id}>
+											<td>{index + 1}</td>
+											<td>{user.firstname}</td>
+											<td>{user.username}</td>
+											<td>{user.emailID}</td>
+											<td>{user.mobileNumber}</td>
+											<td>
+												{sortedFeedback.map((feedback, idx) => (
+													<div key={idx}>
+														<p>
+															{' '}
+															{idx + 1}. Message: {feedback.message}
+														</p>
+														<p>
+															Rating: {this.displayStars(feedback.rating, 5)}
+														</p>
+													</div>
+												))}
+											</td>
+											<td>
+												{user.feedback.length > 0 ? (
+													<div>
+														<p>
+															{this.displayStars(
+																this.calculateAverageRating(user.feedback),
+																5
+															)}
+														</p>
+													</div>
+												) : (
+													<p>No ratings yet</p>
+												)}
+											</td>
+											{this.state.vehicles.some(
+												(vehicle) => vehicle.driverID === user._id
+											) ? (
+												<button
+													onClick={() =>
+														this.showImage(user._id, !showVerifyButton)
+													}
+												>
+													Has vehicle
+												</button>
 											) : (
-												<p>No ratings yet</p>
+												<a>No Vehicle</a>
 											)}
-										</td>
-										{this.state.vehicles.some(
-											(vehicle) => vehicle.driverID === user._id
-										) ? (
-											<a onClick={this.showImage}>Has vehicle</a>
-										) : (
-											<a>No Vehicle</a>
-										)}
-										<td>
-											<button
-												onClick={() =>
-													this.deleteUserAndVehicleAndPools(user._id)
-												}
-											>
-												Delete
-											</button>
-										</td>
-									</tr>
-								))}
+											<td>
+												<button
+													onClick={() =>
+														this.deleteUserAndVehicleAndPools(user._id)
+													}
+												>
+													Delete
+												</button>
+											</td>
+										</tr>
+									);
+								})}
 							</tbody>
 						</table>
 					</div>

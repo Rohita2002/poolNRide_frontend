@@ -11,12 +11,43 @@ export default class ViewPools extends Component {
 
 		this.state = {
 			Rides: [],
+			Users: [],
 		};
 
 		this.getEveryRide = this.getEveryRide.bind(this);
+		this.getAllUsers = this.getAllUsers.bind(this);
 		this.handleDelete = this.handleDelete.bind(this);
 
 		this.getEveryRide();
+		this.getAllUsers();
+	}
+
+	getAllUsers() {
+		const uri = `http://localhost:4000/user/allusers`;
+
+		// Get user id and send it in with the post request.
+
+		const self = this;
+
+		fetch(uri, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				const arr = [];
+				data.forEach((user) => {
+					if (user.emailID !== 'admin@gmail.com') arr.push(user);
+				});
+				self.setState({
+					Users: arr,
+				});
+				console.log('data', data);
+			});
 	}
 
 	getEveryRide() {
@@ -77,8 +108,18 @@ export default class ViewPools extends Component {
 				console.log('Request failed', err);
 			});
 	}
-
+	
 	render() {
+		console.log('users', this.state.Users);
+		console.log('pools', this.state.Rides);
+		// Loop through the Rides array and add the corresponding driver to each ride
+		const ridesWithDriver = this.state?.Rides?.map((ride) => {
+			const driver = this.state?.Users?.find(
+				(user) => user._id === ride.driverID
+			);
+			console.log('driver', driver);
+			return { ...ride, driver };
+		});
 		return (
 			<div className="App">
 				<div className="AppGlassNoDiv">
@@ -88,17 +129,44 @@ export default class ViewPools extends Component {
 							<thead>
 								<tr>
 									<th>Serial No.</th>
+									<th>Driver</th>
 									<th>Departure</th>
 									<th>Destination</th>
+									<th>Category</th>
+									<th>Price</th>
+									<th>Status</th>
+									<th>Pool Members and Waypoints</th>
+									
 									<th>Delete</th>
 								</tr>
 							</thead>
 							<tbody>
-								{this.state.Rides.map((ride, index) => (
+								{ridesWithDriver.map((ride, index) => (
 									<tr key={ride._id}>
 										<td>{index + 1}</td>
+										<td>{ride.driver ? ride.driver.firstname : ''}</td>
 										<td>{ride.departure}</td>
 										<td>{ride.destination}</td>
+										<td>{ride.category}</td>
+										<td>Rs.{ride.price}</td>
+										<td>{ride.completed ? "completed" : "pooling"}</td>
+
+										<td>
+											{ride.poolMembers.map((member, idx) => {
+												const user = this.state.Users.find(
+													(u) => u._id === member.memberID
+												);
+												return (
+													<div key={idx}>
+														<p>
+															{idx + 1}. Member: {user ? user.firstname : ''}
+														</p>
+														<p>Waypoint: {member.waypoint}</p>
+													</div>
+												);
+											})}
+										</td>
+										
 										<td>
 											<button onClick={() => this.handleDelete(ride._id)}>
 												Delete

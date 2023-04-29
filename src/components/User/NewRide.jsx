@@ -302,6 +302,7 @@ class NewRide extends Component {
 		formData.append('vehicleRegNo', this.state.vehicleRegNo);
 		formData.append('vehicleSpecification', this.state.vehicleSpecification);
 		formData.append('driverID', this.state.driverID);
+		formData.append('licenseID', this.state.licenseID);
 		formData.append('licenseIdPicture', this.state.licenseIdPicture);
 
 		fetch(uri, {
