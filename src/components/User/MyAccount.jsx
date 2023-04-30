@@ -38,7 +38,34 @@ class MyAccount extends Component {
 		this.handleHideModalPools = this.handleHideModalPools.bind(this);
 		this.handleDeleteVehicle = this.handleDeleteVehicle.bind(this);
 		this.handleViewPools = this.handleViewPools.bind(this);
+
+		this.calculateAverageRating = this.calculateAverageRating.bind(this);
+		this.displayStars = this.displayStars.bind(this);
 		this.signedInUser();
+	}
+
+	calculateAverageRating(feedback) {
+		const total = feedback.reduce((acc, curr) => acc + curr.rating, 0);
+		const avg = total / feedback.length;
+		return avg.toFixed(1);
+	}
+
+	displayStars(numStars, maxStars) {
+		const fullStars = Math.floor(numStars);
+		console.log('fullstars', fullStars);
+		const halfStar = numStars % 1 >= 0.5 ? '★' : '☆';
+		console.log('mod', numStars % 1);
+		console.log('half stars', halfStar);
+		const emptyStars = maxStars - fullStars - (halfStar === '★' ? 1 : 0);
+		console.log('empty stars', emptyStars);
+
+		const stars =
+			numStars % 1 >= 0.5
+				? '★'.repeat(fullStars) + halfStar + '☆'.repeat(emptyStars)
+				: '★'.repeat(fullStars) + '☆'.repeat(emptyStars);
+
+		console.log('stars', stars);
+		return stars;
 	}
 
 	handleViewPools() {
@@ -448,11 +475,68 @@ class MyAccount extends Component {
 										/>
 									</svg>
 								)}
+								{this.state.user?.feedback.length > 0 ? (
+									<div>
+										<p>
+											{this.displayStars(
+												this.calculateAverageRating(this.state.user.feedback),
+												5
+											)}
+										</p>
+									</div>
+								) : (
+									<p>No ratings yet</p>
+								)}
 								<p>First Name: {this.state.user.firstname}</p>
 								<p>Last Name: {this.state.user.lastname}</p>
 								<p>User Name: {this.state.user.username}</p>
 								<p>Email ID: {this.state.user.emailID}</p>
 								<p>Mobile Number: {this.state.user.mobileNumber}</p>
+								{/* feedback */}
+								<div>
+									<p>My Feedback: </p>
+									{this.state.user.feedback && (
+										<div>
+											<Button
+												variant="primary"
+												onClick={this.handleShowModalPools}
+											>
+												View
+											</Button>
+											<Modal
+												show={this.state.showModalPools}
+												onHide={this.handleHideModalPools}
+											>
+												<Modal.Header closeButton>
+													<Modal.Title>Feedback</Modal.Title>
+												</Modal.Header>
+												<Modal.Body style={{ height: '400px' }}>
+													{this.state.user.feedback &&
+														this.state.user.feedback.map((item, index) => (
+															<div key={index}>
+																<p>Message: {item.message}</p>
+																<p>Rating: {this.displayStars(item.rating, 5)}</p>
+															</div>
+														))}
+												</Modal.Body>
+												<Modal.Footer>
+													<Button
+														variant="secondary"
+														onClick={this.handleHideModalPools}
+													>
+														Close
+													</Button>
+												</Modal.Footer>
+											</Modal>
+										</div>
+									)}
+									{!this.state.vehicleDetails && (
+										<div>
+											<p>No vehicle registered</p>
+										</div>
+									)}
+								</div>
+
 								<div>
 									<p>My Vehicle Details: </p>
 									{this.state.vehicleDetails && (

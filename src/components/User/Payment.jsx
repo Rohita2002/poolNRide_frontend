@@ -100,11 +100,24 @@ export default class Payment extends Component {
 									</tr>
 								</thead>
 								<tbody>
-									{this.state.poolers?.map((user, index) => (
+									{/* {this.state.poolers?.map((user, index) => (
 										<tr key={user._id}>
 											<td>{index + 1}</td>
 											<td>{user.firstname}</td>
 											<td>-</td>
+											<td>
+												The price will be intimated at ur drop off location by
+												the driver.
+											</td>
+										</tr>
+									))} */}
+									{this.state.poolers?.map((user, index) => (
+										<tr key={user._id}>
+											<td>{index + 1}</td>
+											<td>{user.firstname}</td>
+											<td>
+												{this.state.poolDetails.poolMembers[index].waypoint}
+											</td>
 											<td>
 												The price will be intimated at ur drop off location by
 												the driver.

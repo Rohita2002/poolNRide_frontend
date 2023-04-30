@@ -547,7 +547,7 @@ class Rideentry extends Component {
 									<Modal
 										show={this.state.showModal}
 										onHide={this.handleHideModal}
-										size="lg"
+										size="xl"
 									>
 										<Modal.Header closeButton>
 											<Modal.Title>Map Modal</Modal.Title>
