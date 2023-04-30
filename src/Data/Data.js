@@ -59,12 +59,10 @@ export const cardsData = [
 		barValue: 70,
 		value: '25,970',
 		png: UilClipboardAlt,
-		series: [
-			{
-				name: 'Users',
-				data: [31, 40, 28, 51, 42, 109, 100],
-			},
-		],
+		series: {
+			name: 'Users',
+			data: [31, 40, 28, 51, 42, 109, 100],
+		},
 	},
 	{
 		title: 'Active Pools',
